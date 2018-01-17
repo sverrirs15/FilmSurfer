@@ -12,10 +12,10 @@ payload_login = {
     'password': 'coolguys2083'
 }
 
-def get_page(url):
+def get_page(url, s):
     r = s.get(url)
     data = r.text
-    return BeautifulSoup(data, 'lxml')
+    return BeautifulSoup(data, 'html.parser')
 
 def get_movies():
     with requests.Session() as s:
@@ -42,29 +42,12 @@ def get_movies():
                 film["title"] = name
 
                 films.append(film)
-#
-#                print("Name: %s" % name)
-#                print("Link: %s" % link)
-#                print(url_root + link)
-#                torrent_page = get_page(url_root + link)
-#
-#                download_link = torrent_page.find('a', {'class': 'index'})['href']
-#                full_link = url_root + download_link
-#                print(full_link)
-#                r = s.get(full_link)
-#
-#                with open('/home/sverrir/Desktop/FilmSurfer/torrents/' + id + '.torrent', 'wb') as f:
-#                    f.write(r.content)
-#
-#                print("transmission-cli -w /home/sverrir/Desktop/FilmSurfer/torrents_ready/"
-#                          + " " + '/home/sverrir/Desktop/FilmSurfer/torrents/' + id + '.torrent')
-#                os.system("transmission-cli -w /home/sverrir/Desktop/FilmSurfer/torrents_ready/"
-#                          + " " + '/home/sverrir/Desktop/FilmSurfer/torrents/' + id + '.torrent')
-#
+
         return {"movies": films}
 
 
 def download_movie(movie_id):
+    print("Gonna download %s" % movie_id)
     with requests.Session() as s:
         r = s.post(url_login, data=payload_login)
         r = s.get(url_top_movies)
@@ -81,12 +64,12 @@ def download_movie(movie_id):
                 link = movie.a['href']
                 id = link.split('=')[1]
                 if movie_id != id:
-                    break
+                    continue
 
                 print("Name: %s" % name)
                 print("Link: %s" % link)
                 print(url_root + link)
-                torrent_page = get_page(url_root + link)
+                torrent_page = get_page(url_root + link, s)
 
                 download_link = torrent_page.find('a', {'class': 'index'})['href']
                 full_link = url_root + download_link
@@ -94,8 +77,22 @@ def download_movie(movie_id):
                 print(full_link)
                 r = s.get(full_link)
 
-                with open('/home/sverrir/Desktop/FilmSurfer/torrents/' + id + '.torrent', 'wb') as f:
+                with open('/home/sverrir/Dropbox/FilmSurfer/FilmSurfer/torrents/' + id + '.torrent', 'wb') as f:
                     f.write(r.content)
 
-                os.system("transmission-cli -w /home/sverrir/Desktop/FilmSurfer/torrents_ready/"
-                          + " " + '/home/sverrir/Desktop/FilmSurfer/torrents/' + id + '.torrent')
+                os.system("transmission-cli -w /home/sverrir/Dropbox/FilmSurfer/FilmSurfer/torrents_ready/"
+                          + " " + '/home/sverrir/Dropbox/FilmSurfer/FilmSurfer/torrents/' + id + '.torrent')
+
+    return "Finished downloading"
+
+
+def get_my_movies():
+    return {"movies": os.listdir('/home/sverrir/Dropbox/FilmSurfer/FilmSurfer/torrents_ready')}
+
+
+
+def play_movie(movie):
+    # Todo: Find nice film to play
+    path = "/home/sverrir/Dropbox/FilmSurfer/FilmSurfer/torrents_ready/"
+    os.system("vlc --fullscreen " + path + movie)
+    return movie

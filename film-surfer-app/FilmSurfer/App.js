@@ -1,77 +1,72 @@
 import React, { Component } from 'react';
-import { AppRegistry, StyleSheet, FlatList, Text, View, Alert, ActivityIndicator, Platform } from 'react-native';
+import { View, StyleSheet, Dimensions, Text, AppRegistry, FlatList, Alert, ActivityIndicator, Platform } from 'react-native';
+import { TabViewAnimated, TabBar, SceneMap } from 'react-native-tab-view';
+import Movies from './Movies.js';
+import MyMovies from './My_movies.js';
 
-export default class Movies extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      dataSource: [],
-    }
-  }
+const initialLayout = {
+  height: 0,
+  width: Dimensions.get('window').width,
+};
 
-  componentWillMount() {
-    return fetch('http://192.168.1.110:5000/get_movies')
-      .then((response) => response.json())
-      .then((responseJson) => {
-        this.setState({
-          dataSource: responseJson.movies,
-        });
-        console.log(responseJson.movies);
-      });
-  }
 
-  FlatListItemSeparator = () => {
-    return (
-      <View
-        style={{
-          height: 1,
-          width: "100%",
-          backgroundColor: "#607D8B",
-        }}
-      />
-    );
-  }
+FirstRoute = () => <View style={[ styles.container, { backgroundColor: '#2c3e50' } ]}>
 
-  GetFlatListItem (title) {
+  <Movies />
+</View>;
 
-  Alert.alert(title);
+SecondRoute = () => <View style={[ styles.container, { backgroundColor: '#16a085' } ]}>
+  <MyMovies />
+</View>;
 
-  }
+export default class TabViewExample extends Component {
+  state = {
+    index: 0,
+    routes: [
+      { key: 'first', title: 'Top 100' },
+      { key: 'second', title: 'My Movies' },
+    ],
+  };
+
+  _handleIndexChange = index => this.setState({ index });
+
+  _renderHeader = props => <TabBar {...props} />;
+
+  _renderScene = SceneMap({
+    first: FirstRoute,
+    second: SecondRoute,
+  });
 
   render() {
     return (
-      <View style={styles.MainContainer}>
-        <FlatList
-
-          data={ this.state.dataSource }
-
-          ItemSeparatorComponent = {this.FlatListItemSeparator}
-
-          renderItem={({item}) => <Text style={styles.FlatListItemStyle} onPress={this.GetFlatListItem.bind(this, item.title)} > {item.title} </Text>}
-
-          keyExtractor={(item, index) => index}
-
-         />
-      </View>
+      <TabViewAnimated
+        style={styles.container}
+        navigationState={this.state}
+        renderScene={this._renderScene}
+        renderHeader={this._renderHeader}
+        onIndexChange={this._handleIndexChange}
+        initialLayout={initialLayout}
+      />
     );
   }
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  MainContainer :{
 
-MainContainer :{
+  justifyContent: 'center',
+  flex:1,
+  margin: 10,
+  paddingTop: (Platform.OS === 'ios') ? 20 : 0,
 
-justifyContent: 'center',
-flex:1,
-margin: 10,
-paddingTop: (Platform.OS === 'ios') ? 20 : 0,
-
-},
-
-FlatListItemStyle: {
-    padding: 10,
-    fontSize: 18,
-    height: 65,
   },
 
+  FlatListItemStyle: {
+      padding: 10,
+      fontSize: 18,
+      height: 65,
+    },
 });
