@@ -1,87 +1,111 @@
-import React, { Component } from 'react';
-import { AppRegistry, StyleSheet, FlatList, Text, View, Alert, ActivityIndicator, Platform } from 'react-native';
+import React, { Component } from "react";
+import {
+  AppRegistry,
+  StyleSheet,
+  FlatList,
+  Text,
+  View,
+  Alert,
+  ActivityIndicator,
+  Platform,
+  Image
+} from "react-native";
+import Movie from "./Movie.js";
 
 export default class Movies extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      dataSource: [],
-    }
+      dataSource: []
+    };
   }
 
   componentWillMount() {
-    return fetch('http://192.168.1.110:5000/get_movies')
-      .then((response) => response.json())
-      .then((responseJson) => {
+    return fetch("http://192.168.1.131:5000/get_movies")
+      .then(response => response.json())
+      .then(responseJson => {
         this.setState({
-          dataSource: responseJson.movies,
+          dataSource: responseJson.movies
         });
         console.log(responseJson.movies);
       });
   }
 
-  FlatListItemSeparator = () => {
-    return (
-      <View
-        style={{
-          height: 1,
-          width: "100%",
-          backgroundColor: "#607D8B",
-        }}
-      />
+  GetFlatListItem(title, movieID) {
+    Alert.alert(
+      title,
+      "Download this movie?",
+      [
+        {
+          text: "Yes",
+          onPress: () =>
+            console.log(
+              fetch(
+                "http://192.168.1.131:5000/download_movie?movieID=" + movieID
+              )
+            )
+        },
+        //{text: 'Yes', onPress: () => console.log(movieID)},
+        { text: "No", onPress: () => console.log("No downloaderino") }
+      ],
+      { cancelable: false }
     );
   }
 
-  GetFlatListItem (title, movieID) {
+  /*
+  <Text
+                style={styles.FlatListItemStyle}
+                onPress={this.GetFlatListItem.bind(
+                  this,
+                  item.title,
+                  item.movieID
+                )}
+              >
+                {" "}
+                {item.movie}{" "}
+              </Text>
+              <Image
+                style={{ width: 150, height: 200 }}
+                source={{ uri: item.poster }}
+              />
 
-    Alert.alert(
-      title,
-      'Download this movie?',
-      [
-        {text: 'Yes', onPress: () => console.log(fetch('http://192.168.1.110:5000/download_movie?movieID=' + movieID))},
-        //{text: 'Yes', onPress: () => console.log(movieID)},
-        {text: 'No', onPress: () => console.log('No downloaderino')},
-      ],
-      { cancelable: false}
-    )
 
-  }
+  */
 
   render() {
     return (
-      <View style={styles.MainContainer}>
+      <View style={styles.background}>
         <FlatList
-
-          data={ this.state.dataSource }
-
-          ItemSeparatorComponent = {this.FlatListItemSeparator}
-
-          renderItem={({item}) => <Text style={styles.FlatListItemStyle} onPress={this.GetFlatListItem.bind(this, item.title, item.movieID)} > {item.title} </Text>}
-
+          data={this.state.dataSource}
+          renderItem={({ item }) => (
+            <View style={styles.singleEntry}>
+              <Movie
+                onPress={this.GetFlatListItem.bind(
+                  this,
+                  item.title,
+                  item.movieID
+                )}
+                name={item.movie}
+                poster={item.poster}
+                rating={item.rating}
+              />
+            </View>
+          )}
           keyExtractor={(item, index) => index}
-
-         />
+        />
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-
-MainContainer :{
-
-justifyContent: 'center',
-flex:1,
-margin: 10,
-paddingTop: (Platform.OS === 'ios') ? 20 : 0,
-
-},
-
-FlatListItemStyle: {
-    padding: 10,
-    fontSize: 18,
-    height: 65,
-    color: 'white'
+  singleEntry: {
+    height: 200,
+    width: "100%",
+    marginVertical: 10,
+    marginHorizontal: 5
   },
-
+  background: {
+    backgroundColor: "#34495e"
+  }
 });

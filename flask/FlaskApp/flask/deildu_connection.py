@@ -1,21 +1,23 @@
 from bs4 import BeautifulSoup
 import requests
 import os
-
+import re
+import PTN
+import json
 
 url_root = 'http://afghanpirate.com/'
 url_login = 'http://afghanpirate.com/takelogin.php'
 url_top_movies = 'http://afghanpirate.com/browse.php?cat=6&sort=seeders&type=desc'
+apikey = 'a345b6e2'
 
-payload_login = {
-    'username': 'jobs',
-    'password': 'coolguys2083'
-}
+payload_login = {'username': 'jobs', 'password': 'coolguys2083'}
+
 
 def get_page(url, s):
     r = s.get(url)
     data = r.text
     return BeautifulSoup(data, 'html.parser')
+
 
 def get_movies():
     with requests.Session() as s:
@@ -26,21 +28,35 @@ def get_movies():
 
         body_element = soup.find('table', {'class': 'torrentlist'})
         movies = body_element.find_all('td', {'align': 'left'})
-        
-        films = []
 
+        films = []
 
         for movie in movies:
             if movie.a is not None and movie.a.b is not None:
-                name = movie.a.b.text
+                title = movie.a.b.text
                 link = movie.a['href']
                 id = link.split('=')[1]
+                movie = PTN.parse(title)["title"]
 
                 film = dict()
                 film["year"] = 1933
                 film["movieID"] = id
-                film["title"] = name
+                film["title"] = title
+                film["movie"] = movie
+                film["rating"] = "8.3"
 
+                res = requests.get('http://www.omdbapi.com/?t=' + movie +
+                                   '&apikey=a345b6e2').text
+
+                res = json.loads(res)
+                try:
+                    film["poster"] = res['Poster']
+                except KeyError:
+                    film[
+                        "poster"] = 'https://images-na.ssl-images-amazon.com/images/I/11382C6KyhL._SX425_.jpg'
+
+                #film[
+                #"poster"] = 'https://images-na.ssl-images-amazon.com/images/M/MV5BNzA1Njg4NzYxOV5BMl5BanBnXkFtZTgwODk5NjU3MzI@._V1_SX300.jpg'
                 films.append(film)
 
         return {"movies": films}
@@ -57,7 +73,6 @@ def download_movie(movie_id):
         body_element = soup.find('table', {'class': 'torrentlist'})
         movies = body_element.find_all('td', {'align': 'left'})
 
-
         for movie in movies:
             if movie.a is not None and movie.a.b is not None:
                 name = movie.a.b.text
@@ -71,24 +86,36 @@ def download_movie(movie_id):
                 print(url_root + link)
                 torrent_page = get_page(url_root + link, s)
 
-                download_link = torrent_page.find('a', {'class': 'index'})['href']
+                download_link = torrent_page.find('a', {
+                    'class': 'index'
+                })['href']
                 full_link = url_root + download_link
 
                 print(full_link)
                 r = s.get(full_link)
 
-                with open('/home/sverrir/Dropbox/FilmSurfer/FilmSurfer/torrents/' + id + '.torrent', 'wb') as f:
+                with open(
+                        '/home/sverrir/Dropbox/FilmSurfer/FilmSurfer/torrents/'
+                        + id + '.torrent', 'wb') as f:
                     f.write(r.content)
 
-                os.system("transmission-cli -w /home/sverrir/Dropbox/FilmSurfer/FilmSurfer/torrents_ready/"
-                          + " " + '/home/sverrir/Dropbox/FilmSurfer/FilmSurfer/torrents/' + id + '.torrent')
+                os.system(
+                    "transmission-cli -w /home/sverrir/Dropbox/FilmSurfer/FilmSurfer/torrents_ready/"
+                    + " " +
+                    '/home/sverrir/Dropbox/FilmSurfer/FilmSurfer/torrents/' +
+                    id + '.torrent')
 
     return "Finished downloading"
 
 
 def get_my_movies():
-    return {"movies": os.listdir('/home/sverrir/Dropbox/FilmSurfer/FilmSurfer/torrents_ready')}
+    try:
+        movies = os.listdir(
+            '/home/sverrir/Dropbox/FilmSurfer/FilmSurfer/torrents_ready')
+    except FileNotFoundError:
+        movies = ['No movies found']
 
+    return {"movies": movies}
 
 
 def play_movie(movie):
