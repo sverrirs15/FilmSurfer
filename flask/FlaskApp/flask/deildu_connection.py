@@ -43,20 +43,31 @@ def get_movies():
                 film["movieID"] = id
                 film["title"] = title
                 film["movie"] = movie
-                film["rating"] = "8.3"
-
+                film["imdb"] = "9.0"
+                film["rotten"] = "8.3"
+                film["metacritic"] = "8.7"
+                film["plot"] = "When the menace known as the Joker emerges from his mysterious past, he wreaks havoc and chaos on the people of Gotham, the Dark Knight must accept one of the greatest psychological and physical tests of his ability to fight injustice."
+                film["poster"] = "https://images-na.ssl-images-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_SX300.jpg"
+                '''
                 res = requests.get('http://www.omdbapi.com/?t=' + movie +
                                    '&apikey=a345b6e2').text
 
                 res = json.loads(res)
                 try:
                     film["poster"] = res['Poster']
+                    film["plot"] = res['Plot']
+                    film["imdb"] = res['Ratings'][0]['Value']
+                    film["rotten"] = res['Ratings'][1]['Value']
+                    film["metacritic"] = res['Ratings'][2]['Value']
                 except KeyError:
-                    film[
-                        "poster"] = 'https://images-na.ssl-images-amazon.com/images/I/11382C6KyhL._SX425_.jpg'
-
-                #film[
-                #"poster"] = 'https://images-na.ssl-images-amazon.com/images/M/MV5BNzA1Njg4NzYxOV5BMl5BanBnXkFtZTgwODk5NjU3MzI@._V1_SX300.jpg'
+                    continue
+                except IndexError:
+                    film["imdb"] = '-'
+                    film["rotten"] = '-'
+                    film["metacritic"] = '-'
+                    '''
+                
+                
                 films.append(film)
 
         return {"movies": films}

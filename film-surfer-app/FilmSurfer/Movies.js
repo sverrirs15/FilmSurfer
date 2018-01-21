@@ -8,8 +8,10 @@ import {
   Alert,
   ActivityIndicator,
   Platform,
-  Image
+  Image,
+  TouchableOpacity
 } from "react-native";
+import { StackNavigator } from 'react-navigation';
 import Movie from "./Movie.js";
 
 export default class Movies extends Component {
@@ -20,8 +22,19 @@ export default class Movies extends Component {
     };
   }
 
+  static navigationOptions = {
+    tabBarLabel: 'Top 100',
+    // Note: By default the icon is only shown on iOS. Search the showIcon option below.
+    tabBarIcon: ({ tintColor }) => (
+      <Image
+        source={require('./trophy-icon.png')}
+        style={[styles.icon, {tintColor: tintColor}]}
+      />
+    ),
+  };
+
   componentWillMount() {
-    return fetch("http://192.168.1.131:5000/get_movies")
+    return fetch("http://192.168.1.110:5000/get_movies")
       .then(response => response.json())
       .then(responseJson => {
         this.setState({
@@ -41,7 +54,7 @@ export default class Movies extends Component {
           onPress: () =>
             console.log(
               fetch(
-                "http://192.168.1.131:5000/download_movie?movieID=" + movieID
+                "http://192.168.1.110:5000/download_movie?movieID=" + movieID
               )
             )
         },
@@ -52,44 +65,29 @@ export default class Movies extends Component {
     );
   }
 
-  /*
-  <Text
-                style={styles.FlatListItemStyle}
-                onPress={this.GetFlatListItem.bind(
-                  this,
-                  item.title,
-                  item.movieID
-                )}
-              >
-                {" "}
-                {item.movie}{" "}
-              </Text>
-              <Image
-                style={{ width: 150, height: 200 }}
-                source={{ uri: item.poster }}
-              />
-
-
-  */
-
   render() {
+    
+    const {navigate} = this.props.navigation;
     return (
       <View style={styles.background}>
         <FlatList
           data={this.state.dataSource}
           renderItem={({ item }) => (
-            <View style={styles.singleEntry}>
+            <TouchableOpacity style={styles.singleEntry} onPress={() => 
+              navigate('Details', {
+              name: item.movie, 
+            poster: item.poster, 
+            imdb: item.imdb,
+            rotten: item.rotten,
+            metacritic: item.metacritic,
+            plot: item.plot})}>
               <Movie
-                onPress={this.GetFlatListItem.bind(
-                  this,
-                  item.title,
-                  item.movieID
-                )}
                 name={item.movie}
                 poster={item.poster}
-                rating={item.rating}
+                imdb={item.imdb}
+                year={item.year}
               />
-            </View>
+            </TouchableOpacity>
           )}
           keyExtractor={(item, index) => index}
         />
@@ -107,5 +105,9 @@ const styles = StyleSheet.create({
   },
   background: {
     backgroundColor: "#34495e"
-  }
+  },
+  icon: {
+    width: 26,
+    height: 26,
+  },
 });

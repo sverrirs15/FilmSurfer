@@ -7,7 +7,8 @@ import {
   View,
   Alert,
   ActivityIndicator,
-  Platform
+  Platform,
+  Image
 } from "react-native";
 
 export default class MyMovies extends Component {
@@ -18,8 +19,19 @@ export default class MyMovies extends Component {
     };
   }
 
+  static navigationOptions = {
+    tabBarLabel: 'My Movies',
+    // Note: By default the icon is only shown on iOS. Search the showIcon option below.
+    tabBarIcon: ({ tintColor }) => (
+      <Image
+        source={require('./my-movies-icon.png')}
+        style={[styles.icon, {tintColor: tintColor}]}
+      />
+    ),
+  };
+
   componentWillMount() {
-    return fetch("http://192.168.1.131:5000/get_my_movies")
+    return fetch("http://192.168.1.110:5000/get_my_movies")
       .then(response => response.json())
       .then(responseJson => {
         this.setState({
@@ -50,7 +62,7 @@ export default class MyMovies extends Component {
           text: "Yes",
           onPress: () =>
             console.log(
-              fetch("http://192.168.1.131:5000/play_movie?movie=" + title)
+              fetch("http://192.168.1.110:5000/play_movie?movie=" + title)
             )
         },
         { text: "No", onPress: () => console.log("No playerino") }
@@ -81,4 +93,9 @@ export default class MyMovies extends Component {
   }
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  icon: {
+    width: 26,
+    height: 26,
+  },
+});

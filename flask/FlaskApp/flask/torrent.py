@@ -44,4 +44,4 @@ def play_movie():
 
 
 if __name__ == "__main__":
-    app.run(host='192.168.1.131', debug=True)
+    app.run(host='192.168.1.110', debug=True)
