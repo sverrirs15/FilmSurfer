@@ -80,7 +80,8 @@ export default class Movies extends Component {
             imdb: item.imdb,
             rotten: item.rotten,
             metacritic: item.metacritic,
-            plot: item.plot})}>
+            plot: item.plot,
+            movieID: item.movieID})}>
               <Movie
                 name={item.movie}
                 poster={item.poster}
@@ -104,7 +105,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5
   },
   background: {
-    backgroundColor: "#34495e"
+    backgroundColor: "#0D1F2D"
   },
   icon: {
     width: 26,

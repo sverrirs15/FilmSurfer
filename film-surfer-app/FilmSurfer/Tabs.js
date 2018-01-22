@@ -29,8 +29,11 @@ const MyApp = TabNavigator({
 }, {
   tabBarPosition: 'bottom',
   animationEnabled: true,
+  swipeEnabled: true,
   tabBarOptions: {
-    activeTintColor: '#e91e63',
+    inactiveTintColor: 'white',
+    activeTintColor: '#E4C3AD',
+    style: {backgroundColor: '#546A7B'},
   },
 });
 
@@ -39,13 +42,16 @@ const RootNavigator = StackNavigator({
     screen: MyApp,
     navigationOptions: {
       headerTitle: 'Film Surfer',
-      headerStyle: {backgroundColor: '#2c3e50'}
+      headerStyle: {backgroundColor: '#546A7B'},
+      headerTitleStyle: {color: '#E4C3AD', fontSize: 20}
     },
   },
   Details: {
     screen: Movie,
     navigationOptions: ({navigation}) => ({
       title: `${navigation.state.params.name}`,
+      headerStyle: {backgroundColor: '#546A7B'},
+      headerTitleStyle: {color: '#E4C3AD', fontSize: 20}
     }),
   },
 });

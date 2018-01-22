@@ -17,6 +17,32 @@ export default class Movie extends Component {
     super(props);
   }
 
+  DownloadMovie(id) {
+    Alert.alert(
+      id,
+            'Download this movie?',
+            [
+              {text: 'Yes', onPress: () => console.log(fetch('http://192.168.1.110:5000/download_movie?movieID=' + id))},
+              {text: 'No', onPress: () => console.log('No playerino')},
+            ],
+            { cancelable: false}
+          )
+      
+        }
+
+        PlayMovie(title) {
+          Alert.alert(
+                  title,
+                  'Play this movie?',
+                  [
+                    {text: 'Yes', onPress: () => console.log(fetch('http://192.168.1.110:5000/play_movie?movie=' + title))},
+                    {text: 'No', onPress: () => console.log('No playerino')},
+                  ],
+                  { cancelable: false}
+                )
+            
+              }
+  
   
 
   render() {
@@ -48,6 +74,63 @@ export default class Movie extends Component {
               uri: this.props.poster
             }}
           />
+        </View>
+      );
+    }
+    else if(this.props.playable != null)
+    {
+      const {state} = this.props.navigation;
+      return (
+        <View style={styles.containerDetails}>
+          <View style={styles.infoDetails}>
+          <Text style={styles.plotDetails}>{state.params.plot}</Text>
+            </View>
+            <View style={styles.posterDetails}>
+              <View style={styles.posterDetailsLeft}>
+              <View style={styles.ratingDetails}>
+              <Image
+                style={styles.ratingIcon}
+                source={{
+                  uri:
+                    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/IMDB_Logo_2016.svg/1200px-IMDB_Logo_2016.svg.png"
+                }}
+              />
+              <Text style={styles.ratingTextDetails}>{state.params.imdb}</Text>
+                </View>
+                <View style={styles.ratingDetails}>
+                <Image
+                style={styles.ratingIcon}
+                source={{
+                  uri:
+                    "http://static.tvtropes.org/pmwiki/pub/images/rotten_tomatoes_8290.jpg"
+                }}
+              />
+              <Text style={styles.ratingTextDetails}>{state.params.rotten}</Text>
+              </View>
+              <View style={styles.ratingDetails}>
+              <Image
+                style={styles.ratingIcon}
+                source={{
+                  uri:
+                    "http://static.metacritic.com/images/icons/mc_fb_og.png"
+                }}
+              />
+              <Text style={styles.ratingTextDetails}>{state.params.metacritic}</Text>
+              </View>
+              </View>
+              <Image
+              style={styles.posterDetailsRight}
+              source={{
+                uri: state.params.poster
+              }}
+              />
+            </View>
+            <Button
+              title="Download"
+              style={{padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: 'white'}}
+              style={{fontSize: 20, color: 'green'}}
+              onPress={this.PlayMovie.bind(this, state.params.title)}
+            />
         </View>
       );
     }
@@ -103,7 +186,7 @@ export default class Movie extends Component {
               title="Download"
               style={{padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: 'white'}}
               style={{fontSize: 20, color: 'green'}}
-              onPress={() =>  console.log("pressed")}
+              onPress={this.DownloadMovie.bind(this, state.params.movieID)}
             />
         </View>
       );
@@ -134,7 +217,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "row",
-    backgroundColor: "#2D5D7B",
+    backgroundColor: "#546A7B",
     padding: 10,
     borderRadius: 20
   },
@@ -162,7 +245,7 @@ const styles = StyleSheet.create({
   containerDetails: {
     flex: 1,
     flexDirection: "column",
-    backgroundColor: "#2D5D7B",
+    backgroundColor: "#546A7B",
   },
   posterDetails: {
     flex: 3,
@@ -189,7 +272,8 @@ const styles = StyleSheet.create({
   plotDetails: {
     color: "white",
     fontSize: 20,
-    margin: 15
+    margin: 15,
+    textAlign: 'justify'
   },
   ratingDetails: {
     flex: 1,
