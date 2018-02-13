@@ -4,6 +4,7 @@ import os
 import re
 import PTN
 import json
+import subprocess
 
 url_root = 'http://afghanpirate.com/'
 url_login = 'http://afghanpirate.com/takelogin.php'
@@ -11,6 +12,8 @@ url_top_movies = 'http://afghanpirate.com/browse.php?cat=6&sort=seeders&type=des
 apikey = 'a345b6e2'
 
 payload_login = {'username': 'jobs', 'password': 'coolguys2083'}
+
+playing_movie = "No movie playing"
 
 
 def get_page(url, s):
@@ -160,8 +163,18 @@ def get_my_movies():
 
 
 def play_movie(movie):
-    # Todo: Find nice film to play
-    path = "/home/sverrir/Dropbox/FilmSurfer/FilmSurfer/torrents_ready/"
-    os.system("vlc --fullscreen " + path + movie)
+    playing_movie = movie
+    path = "./torrents_ready/"
+    subprocess.Popen(["cvlc", "--fullscreen", path + movie],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    
     return movie
 
+
+def get_currently_playing():
+    return playing_movie
+
+
+def stop_playing():
+    os.system("killall vlc")
+
+    return "Success"

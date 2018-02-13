@@ -42,6 +42,14 @@ def play_movie():
     movie = request.args.get('movie')
     return deildu_connection.play_movie(movie)
 
+@app.route("/get_currently_playing")
+def get_currently_playing():
+    return deildu_connection.get_currently_playing()
+
+
+@app.route("/stop_playing")
+def stop_playing():
+    return deildu_connection.stop_playing()
 
 if __name__ == "__main__":
     app.run(host='192.168.1.110', debug=True)
