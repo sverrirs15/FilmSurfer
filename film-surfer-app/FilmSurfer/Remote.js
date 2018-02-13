@@ -12,6 +12,7 @@ import {
   Button,
   TouchableOpacity
 } from "react-native";
+import STRINGS from "./Strings";
 
 export default class Remote extends Component {
   constructor(props) {
@@ -38,7 +39,7 @@ export default class Remote extends Component {
   };
 
   componentWillMount() {
-    return fetch("http://192.168.1.110:5000/get_currently_playing")
+    return fetch("http://" + STRINGS.IP.MAIN + ":5000/get_currently_playing")
       .then(response => response.text())
       .then(responseJson => {
         this.setState({
@@ -55,7 +56,9 @@ export default class Remote extends Component {
         {
           text: "Yes",
           onPress: () =>
-            console.log(fetch("http://192.168.1.110:5000/stop_playing"))
+            console.log(
+              fetch("http://" + STRINGS.IP.MAIN + ":5000/stop_playing")
+            )
         },
         { text: "No", onPress: () => console.log("No playerino") }
       ],

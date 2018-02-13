@@ -11,6 +11,7 @@ import {
   Image,
   Button
 } from "react-native";
+import STRINGS from "./Strings";
 
 export default class Movie extends Component {
   constructor(props) {
@@ -26,7 +27,12 @@ export default class Movie extends Component {
           text: "Yes",
           onPress: () =>
             console.log(
-              fetch("http://192.168.1.110:5000/download_movie?movieID=" + id)
+              fetch(
+                "http://" +
+                  STRINGS.IP.MAIN +
+                  ":5000/download_movie?movieID=" +
+                  id
+              )
             )
         },
         { text: "No", onPress: () => console.log("No playerino") }
@@ -44,7 +50,9 @@ export default class Movie extends Component {
           text: "Yes",
           onPress: () =>
             console.log(
-              fetch("http://192.168.1.110:5000/play_movie?movie=" + title)
+              fetch(
+                "http://" + STRINGS.IP.MAIN + ":5000/play_movie?movie=" + title
+              )
             )
         },
         { text: "No", onPress: () => console.log("No playerino") }

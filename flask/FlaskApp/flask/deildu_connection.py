@@ -111,8 +111,9 @@ def download_movie(movie_id):
                 with open('./torrents/' + id + '.torrent', 'wb') as f:
                     f.write(r.content)
                 print(id)
-                os.system(
-                    "transmission-cli -w ./torrents_ready/" + " " + "./torrents/" + id + ".torrent")
+                #os.system(
+                 #   "transmission-cli -w ./torrents_ready/" + " " + "./torrents/" + id + ".torrent")
+                subprocess.Popen(["transmission-cli", "-w", "./torrents_ready/", "./torrents/" + id + ".torrent"],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
 
     return "Finished downloading"
 
@@ -137,7 +138,7 @@ def get_my_movies():
         film["metacritic"] = "8.7"
         film["plot"] = "When the menace known as the Joker emerges from his mysterious past, he wreaks havoc and chaos on the people of Gotham, the Dark Knight must accept one of the greatest psychological and physical tests of his ability to fight injustice."
         film["poster"] = "https://images-na.ssl-images-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_SX300.jpg"
-        '''
+        
         res = requests.get('http://www.omdbapi.com/?t=' + movie +
                             '&apikey=a345b6e2').text
 
@@ -154,7 +155,7 @@ def get_my_movies():
             film["imdb"] = '-'
             film["rotten"] = '-'
             film["metacritic"] = '-'
-            '''
+            
         
 
         movies.append(film)
@@ -164,6 +165,7 @@ def get_my_movies():
 
 def play_movie(movie):
     playing_movie = movie
+    os.system("transmission-cli")
     path = "./torrents_ready/"
     subprocess.Popen(["cvlc", "--fullscreen", path + movie],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     

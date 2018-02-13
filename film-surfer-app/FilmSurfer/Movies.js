@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { StackNavigator } from "react-navigation";
 import Movie from "./Movie.js";
+import STRINGS from "./Strings";
 
 export default class Movies extends Component {
   constructor(props) {
@@ -39,7 +40,7 @@ export default class Movies extends Component {
   };
 
   componentWillMount() {
-    return fetch("http://192.168.1.110:5000/get_movies")
+    return fetch("http://" + STRINGS.IP.MAIN + ":5000/get_movies")
       .then(response => response.json())
       .then(responseJson => {
         this.setState({

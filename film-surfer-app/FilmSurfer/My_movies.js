@@ -13,12 +13,14 @@ import {
 } from "react-native";
 import { StackNavigator } from "react-navigation";
 import Movie from "./Movie.js";
+import STRINGS from "./Strings";
 
 export default class MyMovies extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      dataSource: []
+      dataSource: [],
+      refreshing: false
     };
   }
 
@@ -39,15 +41,39 @@ export default class MyMovies extends Component {
   };
 
   componentWillMount() {
-    return fetch("http://192.168.1.110:5000/get_my_movies")
+    return fetch("http://" + STRINGS.IP.MAIN + ":5000/get_my_movies")
       .then(response => response.json())
       .then(responseJson => {
         this.setState({
-          dataSource: responseJson.movies
+          dataSource: responseJson.movies,
+          refreshing: false
         });
         console.log(responseJson.movies);
       });
   }
+
+  upDateList = () => {
+    fetch("http://" + STRINGS.IP.MAIN + ":5000/get_my_movies")
+      .then(response => response.json())
+      .then(responseJson => {
+        this.setState({
+          dataSource: responseJson.movies,
+          refreshing: false
+        });
+        console.log(responseJson.movies);
+      });
+  };
+
+  handleRefresh = () => {
+    this.setState(
+      {
+        refreshing: true
+      },
+      () => {
+        this.upDateList();
+      }
+    );
+  };
 
   GetFlatListItem(title, movie) {
     Alert.alert(
@@ -58,7 +84,9 @@ export default class MyMovies extends Component {
           text: "Yes",
           onPress: () =>
             console.log(
-              fetch("http://192.168.1.110:5000/play_movie?movie=" + movie)
+              fetch(
+                "http://" + STRINGS.IP.MAIN + ":5000/play_movie?movie=" + movie
+              )
             )
         },
         //{text: 'Yes', onPress: () => console.log(movieID)},
@@ -78,6 +106,8 @@ export default class MyMovies extends Component {
     return (
       <View style={styles.background}>
         <FlatList
+          refreshing={this.state.refreshing}
+          onRefresh={this.handleRefresh}
           data={this.state.dataSource}
           renderItem={({ item }) => (
             <TouchableOpacity
